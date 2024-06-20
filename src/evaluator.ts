@@ -6,12 +6,35 @@ interface Operator {
   fn: OperatorFunction;
 }
 
-const operators: { [key: string]: Operator } = {
-  '+': { precedence: 1, associativity: 'left', fn: (a, b) => a + b },
-  '-': { precedence: 1, associativity: 'left', fn: (a, b) => a - b },
-  '*': { precedence: 2, associativity: 'left', fn: (a, b) => a * b },
-  '/': { precedence: 2, associativity: 'left', fn: (a, b) => a / b },
-};
+class BasicOperator implements Operator {
+  constructor(
+    public precedence: number,
+    public associativity: 'left' | 'right',
+    public fn: OperatorFunction
+  ) {}
+}
+
+class OperatorFactory {
+  private operators: { [key: string]: Operator } = {};
+
+  registerOperator(symbol: string, operator: Operator) {
+    this.operators[symbol] = operator;
+  }
+
+  getOperator(symbol: string): Operator | undefined {
+    return this.operators[symbol];
+  }
+
+  isOperator(symbol: string): boolean {
+    return symbol in this.operators;
+  }
+}
+
+const operatorFactory = new OperatorFactory();
+operatorFactory.registerOperator('+', new BasicOperator(1, 'left', (a, b) => a + b));
+operatorFactory.registerOperator('-', new BasicOperator(1, 'left', (a, b) => a - b));
+operatorFactory.registerOperator('*', new BasicOperator(2, 'left', (a, b) => a * b));
+operatorFactory.registerOperator('/', new BasicOperator(2, 'left', (a, b) => a / b));
 
 export class Evaluator {
   private toPostfix(tokens: string[]): string[] {
@@ -21,14 +44,15 @@ export class Evaluator {
     for (const token of tokens) {
       if (!isNaN(parseFloat(token))) {
         outputQueue.push(token);
-      } else if (token in operators) {
+      } else if (operatorFactory.isOperator(token)) {
+        const operator = operatorFactory.getOperator(token)!;
         while (
           operatorStack.length &&
           operatorStack[operatorStack.length - 1] !== '(' &&
-          ((operators[token].associativity === 'left' &&
-            operators[token].precedence <= operators[operatorStack[operatorStack.length - 1]].precedence) ||
-            (operators[token].associativity === 'right' &&
-              operators[token].precedence < operators[operatorStack[operatorStack.length - 1]].precedence))
+          ((operator.associativity === 'left' &&
+            operator.precedence <= operatorFactory.getOperator(operatorStack[operatorStack.length - 1])!.precedence) ||
+            (operator.associativity === 'right' &&
+              operator.precedence < operatorFactory.getOperator(operatorStack[operatorStack.length - 1])!.precedence))
         ) {
           outputQueue.push(operatorStack.pop()!);
         }
@@ -57,10 +81,10 @@ export class Evaluator {
     for (const token of postfixTokens) {
       if (!isNaN(parseFloat(token))) {
         stack.push(parseFloat(token));
-      } else if (token in operators) {
+      } else if (operatorFactory.isOperator(token)) {
         const b = stack.pop()!;
         const a = stack.pop()!;
-        stack.push(operators[token].fn(a, b));
+        stack.push(operatorFactory.getOperator(token)!.fn(a, b));
       }
     }
 

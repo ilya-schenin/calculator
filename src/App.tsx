@@ -55,7 +55,7 @@ const App: React.FC = () => {
               <div key={index} style={{ gridArea: button.gridArea }} className='calc__button'>
                 <button 
                   type={button.type ? 'submit' : 'button'} 
-                  onClick={() => setExpression(expression + button.label)}
+                  onClick={() => button.label !== '=' && setExpression(expression + button.label)}
                 >{button.label}</button>
               </div>
             ))}
