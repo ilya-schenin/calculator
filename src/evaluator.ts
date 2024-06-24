@@ -30,7 +30,7 @@ class OperatorFactory {
   }
 }
 
-const operatorFactory = new OperatorFactory();
+export const operatorFactory = new OperatorFactory();
 operatorFactory.registerOperator('+', new BasicOperator(1, 'left', (a, b) => a + b));
 operatorFactory.registerOperator('-', new BasicOperator(1, 'left', (a, b) => a - b));
 operatorFactory.registerOperator('*', new BasicOperator(2, 'left', (a, b) => a * b));

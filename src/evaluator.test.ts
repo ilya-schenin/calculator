@@ -1,4 +1,4 @@
-import Parser from "./parser";
+import {Parser, NumberTokenizerFactory, OperatorTokenizerFactory} from "./parser";
 import { Evaluator } from "./evaluator";
 
 
@@ -8,7 +8,7 @@ describe('Evaluator', () => {
   
     beforeEach(() => {
       evaluator = new Evaluator();
-      parser = new Parser();
+      parser = new Parser([new NumberTokenizerFactory(), new OperatorTokenizerFactory()]);
     });
   
     test('should evaluate simple addition', () => {

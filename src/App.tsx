@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import Parser from './parser';
+import {Parser, OperatorTokenizerFactory, NumberTokenizerFactory} from './parser';
 import { Evaluator } from './evaluator';
 
 const buttons = [
@@ -23,8 +23,8 @@ const buttons = [
 const App: React.FC = () => {
   const [expression, setExpression] = useState('');
   const [result, setResult] = useState<number | null>(null);
-
-  const parser = new Parser();
+  
+  const parser = new Parser([new OperatorTokenizerFactory(), new NumberTokenizerFactory()]);
   const evaluator = new Evaluator();
 
   const handleSubmit = (e: React.FormEvent) => {

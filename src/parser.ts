@@ -49,25 +49,26 @@ interface TokenizerFactory {
     createTokenizer(): Tokenizer;
 }
 
-class NumberTokenizerFactory implements TokenizerFactory {
+export class NumberTokenizerFactory implements TokenizerFactory {
     createTokenizer(): Tokenizer {
         return new NumberTokenizer();
     }
 }
 
-class OperatorTokenizerFactory implements TokenizerFactory {
+export class OperatorTokenizerFactory implements TokenizerFactory {
     createTokenizer(): Tokenizer {
         return new OperatorTokenizer();
     }
 }
 
 
-export default class Parser {
+export class Parser {
     private tokenizers: TokenizerFactory[] = [];
 
-    constructor() {
-        this.tokenizers.push(new NumberTokenizerFactory());
-        this.tokenizers.push(new OperatorTokenizerFactory());
+    constructor(tokenizers: TokenizerFactory[]) {
+        tokenizers.forEach(item => {
+            this.tokenizers.push(item)
+        })
     }
 
     parse(expression: string): string[] {
@@ -108,7 +109,7 @@ export default class Parser {
                 }
                 
                 if (!currentTokenizer) {
-                    throw new Error(`Invalid character encountered: ${char}`);
+                    throw new Error('Invalid symbols was defined');
                 }
 
                 currentTokenizer.append(char);
@@ -118,7 +119,9 @@ export default class Parser {
 
         if (currentTokenizer && currentTokenizer.getToken()) {
             tokens.push(currentTokenizer.getToken());
-        }        
+        }
+        console.log(tokens);
+                
         return tokens;
     }
 }
